@@ -523,7 +523,7 @@ async function getUserData(id) {
         }, 500);
     });
 }
-const testUser = await getUserData(1);
+// const testUser = await getUserData(1);
 // console.log(testUser);
 
 /**
@@ -536,7 +536,7 @@ Hint: Chain ?. for each level; use ?? for the fallback.
 
 const user2 = { profile: null, city: 'New York' };
 const isUnknown = user2?.profile?.address?.city ?? true;
-console.log(isUnknown);
+// console.log(isUnknown);
 
 // Day 7 — DOM & Events (Conceptual/Logic)
 /**
@@ -562,3 +562,125 @@ function search(text) {
 const debouncedSearch = debounce(search, 3000);
 // debouncedSearch('hello');
 // debouncedSearch('world');
+
+/**
+Problem 32: Throttle Function  [Medium]
+Description: Write a throttle(fn, limit) function that ensures fn is called at most once every limit milliseconds.
+Example:
+const throttledScroll = throttle(onScroll, 200);// Fires at most once every 200ms during scroll
+Hint: Track the last call time with Date.now().
+ */
+
+function throttle(fn, limit) {
+    let lastCall = 0;
+    return function (...args) {
+        const now = Date.now();
+        if (now - lastCall >= limit) {
+            fn.apply(this, args);
+            lastCall = now;
+        }
+    }
+}
+
+function onScroll(e) {
+    console.log('Scrolled');
+}
+const throttledScroll = throttle(onScroll, 2000);
+// throttledScroll();
+// throttledScroll();
+
+// function debounce(fn, limit) {
+//     let delaytimeout
+//     return function (...args) {
+//         clearTimeout(delaytimeout)
+//         delaytimeout = setTimeout(() => {
+//             fn.apply(this, args)
+//         }, limit);
+//     }
+// }
+
+// function search(text) {
+//     console.log("Searching for" + text)
+// }
+
+// const debounceDelay = debounce(search, 600)
+// // debounceDelay("Hello")
+
+// function thottle(fn, limit) {
+//     let lastTime = 0
+//     return function (...args) {
+//         const nowTime = Date.now()
+//         if (nowTime - lastTime >= limit) {
+//             fn.apply(this, args);
+//             lastTime = nowTime
+//         }
+//     }
+// }
+
+// function onScrole(search) {
+//     console.log("Scrolled...")
+// }
+// const throttle2 = thottle(onScrole, 6000)
+// throttle2()
+
+/**
+Problem 33: Deep Clone an Object  [Medium]
+Description: Write a function deepClone(obj) that returns a deep copy of a plain object without using JSON.parse/JSON.stringify.
+Example:
+const a = {x: {y: 1}};const b = deepClone(a);b.x.y = 99;// a.x.y is still 1
+Hint: Use recursion and check for object/array types.
+ */
+
+function deepClone(obj) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    if (obj instanceof RegExp) {
+        return new RegExp(obj);
+    }
+    const result = Array.isArray(obj) ? [] : {};
+    Object.keys(obj).forEach(key => {
+        result[key] = deepClone(obj[key]);
+    });
+    return result;
+}
+console.log(deepClone({ a: { b: 1 } }));
+
+/**
+ Problem 34: Event Emitter  [Medium]
+Description: Build a simple EventEmitter class with on(event, listener), emit(event, ...args), and off(event, listener) methods.
+Example:
+const emitter = new EventEmitter();emitter.on('greet', name => console.log('Hello ' + name));emitter.emit('greet', 'Sara'); // Hello Sara
+Hint: Store listeners in an object where keys are event names and values are arrays of functions.
+ */
+
+class EventEmitter {
+    constructor() {
+        this.listeners = {};
+    }
+
+    on(event, listener) {
+        if (!this.listeners[event]) {
+            this.listeners[event] = [];
+        }
+        this.listeners[event].push(listener);
+    }
+
+    emit(event, ...args) {
+        if (this.listeners[event]) {
+            this.listeners[event].forEach(listener => listener(...args));
+        }
+    }
+
+    off(event, listener) {
+        if (this.listeners[event]) {
+            this.listeners[event] = this.listeners[event].filter(l => l !== listener);
+        }
+    }
+}
+const emitter = new EventEmitter();
+emitter.on('greet', name => console.log('Hello ' + name));
+emitter.emit('greet', 'Sara');
